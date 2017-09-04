@@ -8,7 +8,7 @@ router.get('/', function(req, res, next) {
     
     Youtube.authenticate({
         type: "key"
-      , key: "AIzaSyA7JDsPsjSbDcVTtFZVH8_ZKNBzZ4G0PvQ"
+      , key: ""
     });
 
     //,contentDetails,statistics 
