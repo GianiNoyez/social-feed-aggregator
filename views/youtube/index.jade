@@ -1,5 +1,11 @@
 extends ../layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  div(class="container-fluid content flex-container")
+    h3 List of Series
+    each item in data
+        .row
+            .col-xs-3
+                a(href="https://www.youtube.com/watch?v=" + item.id.videoId)
+                    img.img-responsive.col-xs-12.nopaddingsides(src=item.snippet.thumbnails.high.url)
+                    p.title=item.snippet.title
