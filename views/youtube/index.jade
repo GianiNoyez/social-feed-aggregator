@@ -6,7 +6,7 @@ block content
             .col.s3
                 .card
                     .card-image
-                        a(href="https://www.youtube.com/watch?v=" + item.id.videoId)
-                            img.responsive-img(src=item.snippet.thumbnails.high.url)                       
+                        a(href=item.url)
+                            img.responsive-img(src=item.thumbnail)                       
                     .card-action
-                        a(href="https://www.youtube.com/watch?v=" + item.id.videoId)=item.snippet.title
+                        a(href=item.url)=item.title

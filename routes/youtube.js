@@ -21,18 +21,18 @@ router.get('/', function(req, res, next) {
     youtubeChannel.find({}, function(err, channels){
         channels.forEach(function(channel){
             var channelId = channel.channelId;
-
-            console.log(channelId)
-
-            Youtube.search.list({part: 'snippet', channelId: channelId, order: 'date'}, function(err, resp){
-                if(resp.items){
-                    data = resp.items
-                    res.render('youtube/index', { data });
-                }
-                res.render('youtube/index', { data });
-            })
-        })
-    })
+            Youtube.search.list({part: 'snippet', channelId: channelId, order: 'date', maxResults: '25'}, function(err, resp){
+                resp.items.forEach(function(item){
+                    var video = { url: "https://www.youtube.com/watch?v=" + item.id.videoId, thumbnail: item.snippet.thumbnails.high.url, title: item.snippet.title}
+                    data.push(video);
+                });
+                res.render('youtube/index', { data });      
+            });
+        });
+        console.log(data)
+        // res.render('youtube/index', { data });
+    });
+    
 });
 
 router.post('/addChannel', function(req, res, next){
@@ -52,8 +52,22 @@ router.post('/addChannel', function(req, res, next){
             var channelId = url.split("/channel/")[1];
             res.send(createChannelDocument(url, channelId))
         }
+
     }
 })
+
+var saveVideos = function(channelId){
+    Youtube.search.list({part: 'snippet', channelId: channelId, order: 'date', maxResults: '25'}, function(err, resp){
+        
+        console.log(resp)
+        
+        //resp.items.forEach(function(item){
+            //var video = { url: "https://www.youtube.com/watch?v=" + item.id.videoId, thumbnail: item.snippet.thumbnails.high.url, title: item.snippet.title}
+            //data.push(video);
+        //});
+        //res.render('youtube/index', { data });      
+    });
+}
 
 var createChannelDocument = function(url, channelId){
     youtubeChannel.create({
