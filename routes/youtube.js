@@ -1,38 +1,71 @@
 var express = require('express');
+var mongoose = require("mongoose")
+var Youtube = require("youtube-api")
+
 var router = express.Router();
-const Youtube = require("youtube-api")
+
+var youtubeChannelModel = require('../models/youtubeChannelModel')
+var youtubeChannel = youtubeChannelModel.YoutubeChannel();
+
+mongoose.connect('mongodb://localhost/social_feed_aggregator')
+
+Youtube.authenticate({
+    type: "key"
+  , key: ""
+});
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-    var data = null;
+    var data = [];
     
-    Youtube.authenticate({
-        type: "key"
-      , key: ""
-    });
+    youtubeChannel.find({}, function(err, channels){
+        channels.forEach(function(channel){
+            var channelId = channel.channelId;
 
-    //,contentDetails,statistics 
-    // with id
+            console.log(channelId)
 
-    // Youtube.playlistItems.list({part:'snippet,contentDetails', playlistId: 'UUXuqSBlHAE6Xw-yeJA0Tunw', maxResults: 10, order: 'videoPublishedAt'}, function(err, resp){
-    //     if(err){
-    //         console.log(err)
-    //         return;
-    //     }
-
-    //     for(var i = 0; i < resp.items.length; i++){
-    //         if(resp.items[i].id.kind === 'youtube#playlistItem'){
-    //             console.log('['+ i +'] https://www.youtube.com/watch?v=' + resp.items[i].id.videoId + '\t '  + resp.items[i].snippet.publishedAt + '\t ' + resp.items[i].snippet.title)
-    //         }
-    //     }
-        data = [];
-        //console.log(resp.items)
-        res.render('youtube/index', { data });
-    // });  
+            Youtube.search.list({part: 'snippet', channelId: channelId, order: 'date'}, function(err, resp){
+                if(resp.items){
+                    data = resp.items
+                    res.render('youtube/index', { data });
+                }
+                res.render('youtube/index', { data });
+            })
+        })
+    })
 });
 
 router.post('/addChannel', function(req, res, next){
+    if(req.body.channel){
 
+        var url = req.body.channel;
+
+        if (url.indexOf('/user/') > -1)
+        {
+            var username = url.split("/user/")[1];
+            
+            Youtube.channels.list({part: 'snippet', forUsername: username}, function(err, resp){       
+                var channelId = resp.items[0].id;
+                res.send(createChannelDocument(url, channelId))
+            })
+        } else if(url.indexOf('/channel/') > -1){
+            var channelId = url.split("/channel/")[1];
+            res.send(createChannelDocument(url, channelId))
+        }
+    }
 })
+
+var createChannelDocument = function(url, channelId){
+    youtubeChannel.create({
+        url: url,
+        channelId: channelId
+    }, function(err, placeholder){
+        if(err){
+            console.log(err)
+            return false;
+        }
+        return true
+    })
+}
 
 module.exports = router;
