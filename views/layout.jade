@@ -23,20 +23,23 @@ html
         li
           a.btn-floating.red.modal-trigger(href="#modalAdd")
             i.material-icons add
-        li
-          a.btn-floating.yellow.darken-1
-            i.material-icons format_quote
-        li
-          a.btn-floating.green
-            i.material-icons publish
-        li
-          a.btn-floating.blue
-            i.material-icons attach_file
+        //- li
+        //-   a.btn-floating.yellow.darken-1
+        //-     i.material-icons format_quote
+        //- li
+        //-   a.btn-floating.green
+        //-     i.material-icons publish
+        //- li
+        //-   a.btn-floating.blue
+        //-     i.material-icons attach_file
 
-    #modalAdd.modal.modal-fixed-footer
+    #modalAdd.modal
       .modal-content
           h4 Add a New Social Feed     
-          p A bunch of text    
+          .row
+            .input-field.col.s12
+              input#url(type="text")
+              label(for="url") Youtube Channel URL
       .modal-footer
           a.modal-action.modal-close.waves-effect.waves-green.btn-flat(href='#!') Agree
       
